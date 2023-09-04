@@ -18,6 +18,7 @@ public class Bounce : PlayerState
     }
     void Update()
     {
+        Anim.SetBool("Bouncing", isInBounce);
         if (HInput.GetButtonDown("Bounce") && !Player.Grounded)
         {
             isInBounce = true;
@@ -30,8 +31,18 @@ public class Bounce : PlayerState
         {
             Player.rb.velocity = Vector3.ProjectOnPlane(Player.rb.velocity, Vector3.up) -
                                  Vector3.up * downwardBounceForce;
-            
-            
+
+            if (Physics.Raycast(transform.position, -Vector3.up, out RaycastHit hit, 1.75f, Player.GroundRayMask))
+            {
+                if (hit.collider != null)
+                {
+                    isInBounce = false;
+                    Player.Grounded = false;
+                    Player.rb.velocity = Vector3.ProjectOnPlane(Player.rb.velocity, Vector3.up) * hit.normal.y + hit.normal * bounceForce[bounceIndex];
+                    bounceIndex = Mathf.Min(bounceIndex + 1, bounceForce.Length - 1);
+                }
+            }
         }
+        if (Player.Grounded) bounceIndex = 0;
     }
 }

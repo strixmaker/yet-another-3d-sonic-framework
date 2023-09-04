@@ -130,7 +130,7 @@ namespace Framework.Player
         protected void Collision()
         {
             vel = rb.velocity;
-            if (Physics.Raycast(transform.position, Grounded ? -GroundNormal : -Vector3.up, out RaycastHit hit, someDubiousFloat2, GroundRayMask))
+            if (Physics.Raycast(transform.position, Grounded ? -GroundNormal : -Vector3.up, out RaycastHit hit, Grounded ? someDubiousFloat2 : 1f, GroundRayMask))
             {
                 if (hit.collider != null)
                 {

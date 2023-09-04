@@ -32,7 +32,7 @@ public class GeneralState : PlayerState
         Anim.SetFloat("YSpeed", Player.rb.velocity.y);
         Anim.SetInteger("StateID", StateManager.StateID);
 
-        Spinball.SetActive(StateManager.StateID == 1 && !GetState<Boost>().Boosting && Anim.GetCurrentAnimatorStateInfo(0).IsName("Spin") && Player.rb.velocity.y > -5f);
+        Spinball.SetActive(StateManager.StateID == 1 && !GetState<Bounce>().isInBounce && !GetState<Boost>().Boosting && Anim.GetCurrentAnimatorStateInfo(0).IsName("Spin") && Player.rb.velocity.y > -5f);
     }
 
     void LateUpdate(){
