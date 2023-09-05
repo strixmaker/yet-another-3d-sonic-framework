@@ -21,8 +21,10 @@ public class AirDash : PlayerState
     }
     void Update()
     {
-        if (!Player.Grounded && GetState<JumpState>().ReleasedJump && HInput.GetButtonDown("AirDash"))
+        if (!Player.Grounded && HInput.GetButtonDown("AirDash"))
         {
+            Anim.Play("Spin");
+            SetState<JumpState>();
             duration = AirDashDuration;
             AirDashDirection = Player.Input != Vector3.zero ? Player.Input : Vector3.ProjectOnPlane(Player.rb.velocity, Vector3.up).normalized;
             airDashing = true;

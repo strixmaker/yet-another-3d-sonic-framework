@@ -28,6 +28,7 @@ public class GeneralState : PlayerState
         Anim.SetFloat("GroundedSpeed", ProjectedVelocity.magnitude);
         //Anim.SetFloat("Tilt", Tilt); //Uncomment this if you want Sonic's tilting to be based on animations instead of math
         Anim.SetBool("Grounded", Player.Grounded);
+        Anim.SetBool("Slide", Player.Sliding);
         Anim.SetBool("Skidding", Player.Skidding);
         Anim.SetFloat("YSpeed", Player.rb.velocity.y);
         Anim.SetInteger("StateID", StateManager.StateID);

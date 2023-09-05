@@ -67,6 +67,13 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  GravityForceUpward: 0
+  GravityForceDownward: 0
+  SlideTurnSpeed: 1
+  SlideDeceleration: 5
+  SlideSpeedFromIdle: 20
+  GravityForceUpwardSlide: 10
+  GravityForceDownwardSlide: 40
   GravityStrength: 52.29
   AirTurnSpeed: 5
   AirSkiddingForce: 120

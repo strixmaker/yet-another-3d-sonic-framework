@@ -17,6 +17,14 @@ namespace Framework.Player
         public float SpeedLossOnTurn;
         public AnimationCurve TurnSpeedLossMultiplierOverSpeed, TurnRateOverSpeed;
 
+        public float GravityForceUpward, GravityForceDownward;
+
+        [Header("Sliding")] 
+        public float SlideTurnSpeed;
+        public float SlideDeceleration;
+        public float SlideSpeedFromIdle;
+        public float GravityForceUpwardSlide, GravityForceDownwardSlide;
+
         [Header("Air Parameters")]
         public float GravityStrength;
         public float AirTurnSpeed, AirSkiddingForce, AirAcceleration, AirDeceleration;

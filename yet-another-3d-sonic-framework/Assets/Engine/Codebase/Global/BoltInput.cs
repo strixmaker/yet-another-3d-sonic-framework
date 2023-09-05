@@ -10,17 +10,17 @@ public static class HInput{
 	public static float GetAxis(string axisName) => BoltInput.Instance.GetAxis(axisName);
 	public static Vector2 GetAxis2D(string axisName) => BoltInput.Instance.GetAxis2D(axisName);
 
-	public static bool GetButton(string axisName) => BoltInput.Instance.GetButton(axisName);
-	public static bool GetButtonDown(string axisName) => BoltInput.Instance.GetButtonDown(axisName);
-	public static bool GetButtonUp(string axisName) => BoltInput.Instance.GetButtonUp(axisName);
+	public static bool GetButton(string buttonName) => BoltInput.Instance.GetButton(buttonName);
+	public static bool GetButtonDown(string buttonName) => BoltInput.Instance.GetButtonDown(buttonName);
+	public static bool GetButtonUp(string buttonName) => BoltInput.Instance.GetButtonUp(buttonName);
 
 	//--------Functions prefixed with F = force functions, bypasses BoltInput.BlockInput--------//
 	public static float FGetAxis(string axisName) => BoltInput.Instance.FGetAxis(axisName);
 	public static Vector2 FGetAxis2D(string axisName) => BoltInput.Instance.FGetAxis2D(axisName);
 
-	public static bool FGetButton(string axisName) => BoltInput.Instance.FGetButton(axisName);
-	public static bool FGetButtonDown(string axisName) => BoltInput.Instance.FGetButtonDown(axisName);
-	public static bool FGetButtonUp(string axisName) => BoltInput.Instance.FGetButtonUp(axisName);
+	public static bool FGetButton(string buttonName) => BoltInput.Instance.FGetButton(buttonName);
+	public static bool FGetButtonDown(string buttonName) => BoltInput.Instance.FGetButtonDown(buttonName);
+	public static bool FGetButtonUp(string buttonName) => BoltInput.Instance.FGetButtonUp(buttonName);
 	
 	//-----------------------------------------------------------------------------------------//
 	public static void BlockInput() => BoltInput.Instance.BlockInput = true;
@@ -41,11 +41,6 @@ public static class HInput{
 	}
 }
 
-/// <summary>
-/// Input handler for the Blur Framework
-/// 2023 - strix
-/// </summary>
-/// 
 public enum InputType{
 	Keyboard, Mouse, Gamepad
 };

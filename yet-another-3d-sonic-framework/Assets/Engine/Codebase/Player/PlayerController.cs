@@ -24,6 +24,10 @@ namespace Framework.Player
         public const float skidThreshold = -.55f;
         
         Vector3 vel;
+
+        public bool AllowSliding;
+
+        public bool Sliding;
         
         private void Awake()
         {
@@ -36,6 +40,8 @@ namespace Framework.Player
         
         void Update()
         {
+            Sliding = AllowSliding && HInput.GetButton("Crouch");
+            
             ProcessInput();
         }
 
@@ -45,6 +51,7 @@ namespace Framework.Player
             if (Grounded)
             {
                 GroundMovement();
+                SlopePhysics();
             }
             else
             {
@@ -69,22 +76,29 @@ namespace Framework.Player
             if (Input != Vector3.zero && VLateral.normalized == Vector3.zero) VLateral = Input.normalized;
 
             //check for skidding
-            if (!Skidding && Vector3.Dot(rb.velocity.normalized, Input) < skidThreshold && rb.velocity.magnitude > 5 && Input != Vector3.zero) Skidding = true;
-            if (Vector3.Dot(rb.velocity.normalized, Input) > skidThreshold || Input == Vector3.zero) Skidding = false;
-
+            if (!Skidding && Vector3.Dot(rb.velocity.normalized, Input) < skidThreshold && rb.velocity.magnitude > 5 && Input != Vector3.zero && !Sliding) Skidding = true;
+            if (Vector3.Dot(rb.velocity.normalized, Input) > skidThreshold || Input == Vector3.zero || Sliding) Skidding = false;
+    
             float speed = VLateral.magnitude; //Process speed changes here, from acceleration, turning etc
+
+            if (speed == 0 && Sliding && Input != Vector3.zero)
+                rb.velocity = Input.normalized * vars.SlideSpeedFromIdle;
             if (!Skidding){
                 if (Input != Vector3.zero) {
                     VLateral = VLateral.magnitude * 
-                                    Vector3.Lerp(VLateral.normalized, Input.normalized, (vars.TurnSpeed * vars.TurnRateOverSpeed.Evaluate(rb.velocity.magnitude)) * Time.fixedDeltaTime).normalized; //This deals with turning the velocity towards the input
+                                    Vector3.Lerp(VLateral.normalized, Input.normalized, ((!Sliding ? vars.TurnSpeed : vars.SlideTurnSpeed) * vars.TurnRateOverSpeed.Evaluate(rb.velocity.magnitude)) * Time.fixedDeltaTime).normalized; //This deals with turning the velocity towards the input
                 }
                 if (VLateral != Vector3.zero) VelocityDirection = VLateral.normalized;
 
-                if (Input != Vector3.zero)
+                if (Input != Vector3.zero && !Sliding)
                 {
                     if (speed < vars.TopSpeed) speed = Mathf.Min(speed + vars.Acceleration * Time.fixedDeltaTime, vars.TopSpeed);
                 }
-                else speed = Mathf.Max(speed - vars.Deceleration * Time.fixedDeltaTime, 0);
+
+                if (Input == Vector3.zero || Sliding)
+                {
+                    speed = Mathf.Max(speed - (!Sliding ? vars.Deceleration : vars.SlideDeceleration) * Time.fixedDeltaTime, 0);
+                }
             }
             else speed = Mathf.Max(speed - vars.SkiddingForce * Time.fixedDeltaTime, 0);
             
@@ -127,27 +141,37 @@ namespace Framework.Player
             return finalSpeed;
         }
 
+        protected void SlopePhysics()
+        {
+            float slopePhysicAmp = 1 - Mathf.Abs(GroundNormal.y);
+            rb.velocity += Vector3.down * slopePhysicAmp * ((Mathf.Sign(rb.velocity.y) > 0
+                ? (!Sliding ? vars.GravityForceUpward : vars.GravityForceUpwardSlide)
+                : (!Sliding ? vars.GravityForceDownward : vars.GravityForceDownwardSlide)) * Time.fixedDeltaTime);
+        }
+
         protected void Collision()
         {
-            vel = rb.velocity;
             if (Physics.Raycast(transform.position, Grounded ? -GroundNormal : -Vector3.up, out RaycastHit hit, Grounded ? someDubiousFloat2 : 1f, GroundRayMask))
             {
                 if (hit.collider != null)
                 {
-                    if (Grounded){
-                        rb.velocity.Separate(GroundNormal, out Vector3 lat, out Vector3 vert);
-                        transform.position = hit.point + hit.normal * 1.1f;
+                    if (Grounded)
+                    {
+                        float landSpeed = rb.velocity.magnitude;
                         GroundNormal = hit.normal;
+                        rb.velocity.Separate(GroundNormal, out Vector3 lat, out Vector3 vert);
+                        
+                        rb.velocity = Vector3.ProjectOnPlane(lat + vert, GroundNormal);
                         Vector3 dir = rb.velocity.normalized;
 
-                        rb.velocity = Vector3.ProjectOnPlane(rb.velocity, GroundNormal);
-                        rb.velocity = Vector3.MoveTowards(rb.velocity, dir * vel.magnitude, vel.magnitude * 100 * Time.deltaTime);
+                        rb.velocity = Vector3.MoveTowards(rb.velocity, dir * landSpeed, landSpeed * 100 * Time.deltaTime);
+                        rb.position = hit.point + hit.normal * 1.1f;
                     }
                     else{
                         if (rb.velocity.y <= 0) {
                             Grounded = true;
                             GroundNormal = hit.normal;
-                            rb.velocity =  Vector3.ProjectOnPlane(vel, GroundNormal);
+                            rb.velocity =  Vector3.ProjectOnPlane(rb.velocity, GroundNormal);
                         }
                     }
                 }
